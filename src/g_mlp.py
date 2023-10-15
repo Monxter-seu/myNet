@@ -1,3 +1,7 @@
+# Created on 2023/10
+# Author: Kaituo XU,Minxu Hua
+# Based On the structure of Conv-tas-net,using g-mlp and classifier to make an end-to-end classifier
+
 from collections import OrderedDict
 import torch
 import torch.nn as nn
