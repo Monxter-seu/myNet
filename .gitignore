@@ -1,5 +1,6 @@
 egs/*/data
 egs/*/exp
+.DS_Store
 
 tools/sph2pipe_v2.5
 tools/create-speaker-mixtures
