@@ -1,6 +1,7 @@
 # Created on 2023/10
 # Author: Kaituo XU,Minxu Hua
 # Based On the structure of Conv-tas-net,using g-mlp and classifier to make an end-to-end classifier
+# the value of C must be 2 in this case
 
 from collections import OrderedDict
 import torch
@@ -47,6 +48,12 @@ class gMLP(nn.Module):
         """decoder组件
         """
         self.decoder = Decoder(N, L)
+
+        """（中间是否要转化为频域？？）分类器组件
+        """
+        self.classifier0 = BinaryClassifier(L)
+        self.classifier1 = BinaryClassifier(L)
+
         # init
         for p in self.parameters():
             if p.dim() > 1:
@@ -82,7 +89,14 @@ class gMLP(nn.Module):
         """对原信号进行填充
         """
         est_source = F.pad(est_source, (0, T_origin - T_conv))
-        return est_source
+        """est_source是[M,C,T]的格式
+        """
+        channel_0 = est_source[:, 0, :]
+        channel_1 = est_source[:, 1, :]
+        classifier_output0 = self.classifier0(channel_0)
+        classifier_output1 = self.classifier1(channel_1)
+        combined_classifier_output = torch.cat((classifier_output0, classifier_output1), dim=1)
+        return combined_classifier_output
 
     @classmethod
     def load_model(cls, path):
@@ -336,8 +350,38 @@ class ChannelwiseLayerNorm(nn.Module):
         return cLN_y
 
 
-            
+# define Biclassifier
+class BinaryClassifier(nn.Module):
+    def __init__(self,length):
+        super(BinaryClassifier, self).__init__()
+        # 定义三个全连接层
+        # self.fc1 = nn.Linear(2048, 256)
+        self.fc1 = nn.Linear(length, 1024)
+        self.fc2 = nn.Linear(1024, 2048)
+        # self.fc2 = nn.Linear(256, 256)
+        # self.fc3 = nn.Linear(256, 1)
+        # self.fc2_1 = nn.Linear(256, 256)
+        self.fc3 = nn.Linear(2048, 2048)
+        self.fc4 = nn.Linear(2048, 1)
 
+        # 定义ReLU和Sigmoid激活函数
+        self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # 应用第一个全连接层和ReLU激活函数
+        x = self.fc1(x)
+        x = self.relu(x)
+        # 应用第二个全连接层和ReLU激活函数
+        x = self.fc2(x)
+        x = self.relu(x)
+        # 应用第三个全连接层和ReLU激活函数
+        x = self.fc3(x)
+        x = self.relu(x)
+        # 应用第四个全连接层和Sigmoid激活函数
+        x = self.fc4(x)
+        x = self.sigmoid(x)
+        return x
 
 if __name__ == '__main__':
     
