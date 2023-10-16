@@ -408,6 +408,6 @@ if __name__ == '__main__':
     num_layers=6
     input=torch.randint(num_tokens,(bs,len_sen)) #bs,len_sen
     gmlp = gMLP(N, L, B, H, P, X, R, C, norm_type=norm_type)
-    output=gmlp(mixture)
+    output=gmlp(input)
     print(output.shape)
         
