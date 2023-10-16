@@ -400,8 +400,8 @@ if __name__ == '__main__':
     print('mixture_w', mixture_w)
     print('mixture_w size', mixture_w.size())
 
-    num_tokens=10000
-    bs=50
+    num_tokens=100
+    bs=4
     len_sen=49
     num_layers=6
     input=torch.randint(num_tokens,(bs,len_sen)) #bs,len_sen
