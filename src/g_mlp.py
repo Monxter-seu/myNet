@@ -402,7 +402,7 @@ if __name__ == '__main__':
 
     num_tokens=100
     bs=4
-    len_sen=49
+    len_sen=64000
     num_layers=6
     input=torch.randint(num_tokens,(bs,len_sen)) #bs,len_sen
     gmlp = gMLP(N, L, B, H, P, X, R, C, norm_type=norm_type)
