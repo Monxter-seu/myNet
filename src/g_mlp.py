@@ -51,8 +51,8 @@ class gMLP(nn.Module):
 
         """（中间是否要转化为频域？？）分类器组件
         """
-        self.classifier0 = BinaryClassifier(L)
-        self.classifier1 = BinaryClassifier(L)
+        self.classifier0 = BinaryClassifier(64000)
+        self.classifier1 = BinaryClassifier(64000)
 
         # init
         for p in self.parameters():
@@ -91,6 +91,7 @@ class gMLP(nn.Module):
         est_source = F.pad(est_source, (0, T_origin - T_conv))
         """est_source是[M,C,T]的格式
         """
+        print('est_source.size==',est_source.shape)
         channel_0 = est_source[:, 0, :]
         channel_1 = est_source[:, 1, :]
         classifier_output0 = self.classifier0(channel_0)
