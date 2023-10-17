@@ -44,8 +44,8 @@ def overlap_and_add(signal, frame_step):
 
     result = signal.new_zeros(*outer_dimensions, output_subframes, subframe_length)
     
-    frame=frame.to('cuda:0')
-    subframe_signal=subframe_signal.to('cuda:0')
+    frame=frame.to(device)
+    subframe_signal=subframe_signal.to(device)
     
     result.index_add_(-2, frame, subframe_signal)
     result = result.view(*outer_dimensions, -1)

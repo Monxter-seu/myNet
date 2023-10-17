@@ -406,8 +406,8 @@ if __name__ == '__main__':
     #test
     len_sen=64000
     num_layers=6
-    input=torch.randint(num_tokens,(bs,len_sen),dtype=torch.float) #bs,len_sen
+    input = torch.randint(num_tokens, (bs, len_sen), dtype=torch.float) #bs,len_sen
     gmlp = gMLP(N, L, B, H, P, X, R, C, norm_type=norm_type)
-    output=gmlp(input)
+    output = gmlp(input)
     print(output.shape)
         
