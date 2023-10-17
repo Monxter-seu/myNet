@@ -411,4 +411,4 @@ if __name__ == '__main__':
     gmlp = gMLP(N, L, B, H, P, X, R, C, norm_type=norm_type)
     output = gmlp(input)
     print('output.shape==',output.shape)
-        
+    print(output)
