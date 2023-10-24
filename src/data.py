@@ -58,7 +58,7 @@ class myDataset(data.dataset):
             while True:
                 num_segments = 0
                 end = start
-                part_mix, part_s1, part_s2 = [], [], []
+                part_mix = []
                 while num_segments < batch_size and end < len(sorted_mix_infos):
                     utt_len = int(sorted_mix_infos[end][1])
                     if utt_len >= segment_len:  # skip too short utt
@@ -71,8 +71,7 @@ class myDataset(data.dataset):
                         part_mix.append(sorted_mix_infos[end])
                     end += 1
                 if len(part_mix) > 0:
-                    minibatch.append([part_mix, part_s1, part_s2,
-                                      sample_rate, segment_len])
+                    minibatch.append([part_mix, sample_rate, segment_len])
                 if end == len(sorted_mix_infos):
                     break
                 start = end
