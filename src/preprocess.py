@@ -29,7 +29,7 @@ def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
 
 def preprocess(args):
     for data_type in ['tr', 'cv', 'tt']:
-        for speaker in ['mix', 's1', 's2']:
+        for speaker in ['mix']:
             preprocess_one_dir(os.path.join(args.in_dir, data_type, speaker),
                                os.path.join(args.out_dir, data_type),
                                speaker,
