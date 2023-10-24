@@ -2,6 +2,8 @@
 # Created on 2018/12
 # Author: Kaituo XU
 
+# 文件夹命名格式为$num1_$num2
+
 import argparse
 import json
 import os
@@ -12,13 +14,13 @@ import librosa
 def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
     file_infos = []
     in_dir = os.path.abspath(in_dir)
-    wav_list = os.listdir(in_dir)
-    for wav_file in wav_list:
-        if not wav_file.endswith('.wav'):
+    csv_list = os.listdir(in_dir)
+    for csv_file in csv_list:
+        if not csv_file.endswith('.mat'):
             continue
-        wav_path = os.path.join(in_dir, wav_file)
-        samples, _ = librosa.load(wav_path, sr=sample_rate)
-        file_infos.append((wav_path, len(samples)))
+        csv_path = os.path.join(in_dir, csv_file)
+        label = [in_dir[0], in_dir[2]]
+        file_infos.append((csv_path, label))
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     with open(os.path.join(out_dir, out_filename + '.json'), 'w') as f:
@@ -27,7 +29,7 @@ def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
 
 def preprocess(args):
     for data_type in ['tr', 'cv', 'tt']:
-        for speaker in ['mix', 's1', 's2']:
+        for speaker in ['mix']:
             preprocess_one_dir(os.path.join(args.in_dir, data_type, speaker),
                                os.path.join(args.out_dir, data_type),
                                speaker,

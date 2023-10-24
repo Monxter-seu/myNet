@@ -8,6 +8,20 @@ import torch.nn.functional as F
 
 EPS = 1e-8
 
+def new_loss(source_label, estimate_label):
+    source_first_class = source_label[:, 0]
+    source_second_class = source_label[:, 1]
+    estimate_first_class = estimate_label[:, 0]
+    estimate_second_class = estimate_label[:, 1]
+
+    criterion = torch.nn.CrossEntropyLoss()
+
+    loss_first_class = criterion(source_label, estimate_label)
+    loss_second_class = criterion(source_label, estimate_label)
+
+    total_loss = loss_first_class + loss_second_class
+
+    return total_loss
 
 def cal_loss(source, estimate_source, source_lengths):
     """
