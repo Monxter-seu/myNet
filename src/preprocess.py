@@ -18,6 +18,7 @@ def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
     for docu in docu_list:
         docu_dir = os.path.join(in_dir, docu)
         csv_list = os.listdir(docu_dir)
+        print(docu)
         for csv_file in csv_list:
             if not csv_file.endswith('.csv'):
                 continue
