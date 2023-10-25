@@ -20,10 +20,11 @@ def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
         csv_list = os.listdir(docu_dir)
         print(docu)
         for csv_file in csv_list:
+            last_level = os.path.basename(csv_list)
             if not csv_file.endswith('.csv'):
                 continue
             csv_path = os.path.join(docu_dir, csv_file)
-            label = [in_dir[0], in_dir[2]]
+            label = [last_level[0], last_level[2]]
             file_infos.append((csv_path, label))
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
