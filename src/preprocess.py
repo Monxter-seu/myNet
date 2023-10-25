@@ -14,17 +14,20 @@ import librosa
 def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
     file_infos = []
     in_dir = os.path.abspath(in_dir)
-    csv_list = os.listdir(in_dir)
-    for csv_file in csv_list:
-        if not csv_file.endswith('.csv'):
-            continue
-        csv_path = os.path.join(in_dir, csv_file)
-        label = [in_dir[0], in_dir[2]]
-        file_infos.append((csv_path, label))
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-    with open(os.path.join(out_dir, out_filename + '.json'), 'w') as f:
-        json.dump(file_infos, f, indent=4)
+    docu_list = os.listdir(in_dir)
+    for docu in docu_list:
+        docu_dir = os.path.join(in_dir, docu_list)
+        csv_list = os.listdir(docu)
+        for csv_file in csv_list:
+            if not csv_file.endswith('.csv'):
+                continue
+            csv_path = os.path.join(docu_dir, csv_file)
+            label = [in_dir[0], in_dir[2]]
+            file_infos.append((csv_path, label))
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        with open(os.path.join(out_dir, out_filename + '.json'), 'w') as f:
+            json.dump(file_infos, f, indent=4)
 
 
 def preprocess(args):
