@@ -16,7 +16,7 @@ def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
     in_dir = os.path.abspath(in_dir)
     csv_list = os.listdir(in_dir)
     for csv_file in csv_list:
-        if not csv_file.endswith('.mat'):
+        if not csv_file.endswith('.csv'):
             continue
         csv_path = os.path.join(in_dir, csv_file)
         label = [in_dir[0], in_dir[2]]
