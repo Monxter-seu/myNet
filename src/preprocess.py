@@ -14,11 +14,9 @@ import librosa
 def preprocess_one_dir(in_dir, out_dir, out_filename, sample_rate=8000):
     file_infos = []
     in_dir = os.path.abspath(in_dir)
-    print(in_dir)
     docu_list = os.listdir(in_dir)
-    print(docu_list)
     for docu in docu_list:
-        docu_dir = os.path.join(in_dir, docu_list)
+        docu_dir = os.path.join(in_dir, docu)
         csv_list = os.listdir(docu)
         for csv_file in csv_list:
             if not csv_file.endswith('.csv'):
