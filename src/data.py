@@ -374,7 +374,7 @@ def load_mixtures_and_labels(batch):
     # for each utterance
     for mix_info in zip(mix_infos):
         mix_path = mix_info[0]
-
+        print('mix_info',mix_info)
         # read wav file
         with open(mix_path, newline="") as csvfile:
             reader = csv.reader(csvfile)
