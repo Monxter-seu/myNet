@@ -40,6 +40,7 @@ class MyDataset(data.Dataset):
         mix_json = os.path.join(json_dir, 'mix.json')
         with open(mix_json,'r') as f:
             mix_infos = json.load(f)
+            print(mix_infos)
         sorted_mix_infos = mix_infos
 
         minibatch = []
