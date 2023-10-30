@@ -393,7 +393,7 @@ def pad_list(xs, pad_value):
 if __name__ == "__main__":
     #import sys
     #json_dir, batch_size = sys.argv[1:3]
-    dataset = MyDataset('D:\\csvProcess\\testout\\tr\\mix.json', 10)
+    dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', 10)
     data_loader = MyDataLoader(dataset, batch_size=1,
                                   num_workers=4)
     for i, batch in enumerate(data_loader):
