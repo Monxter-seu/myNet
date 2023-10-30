@@ -367,7 +367,7 @@ def load_mixtures_and_labels(batch):
         T varies from item to item.
     """
     mixtures, label_set = [], []
-    print(batch)
+    print('batch========', batch)
     mix_infos, labels = batch
     # for each utterance
     for mix_info, label in zip(mix_infos, labels):
