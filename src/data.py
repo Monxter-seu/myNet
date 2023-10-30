@@ -21,6 +21,7 @@ Output:
 import json
 import math
 import os
+import csv
 
 import numpy as np
 import torch
@@ -32,66 +33,24 @@ import librosa
 # json中应该包含
 
 
-class myDataset(data.dataset):
+class MyDataset(data.dataset):
 
-    def __init__(self, json_dir, batch_size, sample_rate=8000,segment=4.0, cv_maxlen=8.0):
-        super(myDataset, self).__init__()
+    def __init__(self, json_dir, batch_size):
+        super(MyDataset, self).__init__()
         mix_json = os.path.join(json_dir, 'mix.json')
         with open(mix_json,'r') as f:
             mix_infos = json.load(f)
-        def sort(infos): return sorted(
-            infos, key=lambda info: int(info[1]), reverse=True)
-        sorted_mix_infos = sort(mix_infos)
-        if segment >= 0.0:
-            # segment length and count dropped utts
-            segment_len = int(segment * sample_rate)  # 4s * 8000/s = 32000 samples
-            drop_utt, drop_len = 0, 0
-            for _, sample in sorted_mix_infos:
-                if sample < segment_len:
-                    drop_utt += 1
-                    drop_len += sample
-            print("Drop {} utts({:.2f} h) which is short than {} samples".format(
-                drop_utt, drop_len/sample_rate/36000, segment_len))
-            # generate minibach infomations
-            minibatch = []
-            start = 0
-            while True:
-                num_segments = 0
-                end = start
-                part_mix = []
-                while num_segments < batch_size and end < len(sorted_mix_infos):
-                    utt_len = int(sorted_mix_infos[end][1])
-                    if utt_len >= segment_len:  # skip too short utt
-                        num_segments += math.ceil(utt_len / segment_len)
-                        # Ensure num_segments is less than batch_size
-                        if num_segments > batch_size:
-                            # if num_segments of 1st audio > batch_size, skip it
-                            if start == end: end += 1
-                            break
-                        part_mix.append(sorted_mix_infos[end])
-                    end += 1
-                if len(part_mix) > 0:
-                    minibatch.append([part_mix, sample_rate, segment_len])
-                if end == len(sorted_mix_infos):
-                    break
-                start = end
-            self.minibatch = minibatch
-        else:  # Load full utterance but not segment
-            # generate minibach infomations
-            minibatch = []
-            start = 0
-            while True:
-                end = min(len(sorted_mix_infos), start + batch_size)
-                # Skip long audio to avoid out-of-memory issue
-                if int(sorted_mix_infos[start][1]) > cv_maxlen * sample_rate:
-                    start = end
-                    continue
-                minibatch.append([sorted_mix_infos[start:end],
-                                  sample_rate, segment])
-                if end == len(sorted_mix_infos):
-                    break
-                start = end
-            self.minibatch = minibatch
+        sorted_mix_infos = mix_infos
+
+        minibatch = []
+        start = 0
+        while True:
+            end = min(len(sorted_mix_infos), start + batch_size)
+            minibatch.append([sorted_mix_infos[start:end]])
+            if end == len(sorted_mix_infos):
+                break
+            start = end
+        self.minibatch = minibatch
 
     def __getitem__(self, index):
         return self.minibatch[index]
@@ -121,7 +80,7 @@ def _collate_fn(batch):
     """
     # batch should be located in list
     assert len(batch) == 1
-    mixtures, sources = load_mixtures_and_sources(batch[0])
+    mixtures, label = load_mixtures_and_labels(batch[0])
 
     # get batch of lengths of input sequences
     ilens = np.array([mix.shape[0] for mix in mixtures])
@@ -131,11 +90,9 @@ def _collate_fn(batch):
     mixtures_pad = pad_list([torch.from_numpy(mix).float()
                              for mix in mixtures], pad_value)
     ilens = torch.from_numpy(ilens)
-    sources_pad = pad_list([torch.from_numpy(s).float()
-                            for s in sources], pad_value)
-    # N x T x C -> N x C x T
-    sources_pad = sources_pad.permute((0, 2, 1)).contiguous()
-    return mixtures_pad, ilens, sources_pad
+
+    label_tensor = torch.from_numpy(label).float()
+    return mixtures_pad, ilens, label_tensor
 
 
 class AudioDataset(data.Dataset):
@@ -388,16 +345,41 @@ def load_mixtures(batch):
         T varies from item to item.
     """
     mixtures, filenames = [], []
-    mix_infos, sample_rate = batch
+    mix_infos = batch
     # for each utterance
     for mix_info in mix_infos:
         mix_path = mix_info[0]
         # read wav file
-        mix, _ = librosa.load(mix_path, sr=sample_rate)
-        mixtures.append(mix)
+        with open(mix_path, newline="") as csvfile:
+            reader = csv.reader(csvfile)
+            row = next(reader)
+            mixtures.append(row)
         filenames.append(mix_path)
     return mixtures, filenames
 
+
+def load_mixtures_and_labels(batch):
+    """
+    Each info include wav path and wav duration.
+    Returns:
+        mixtures: a list containing B items, each item is T np.ndarray
+        labels: a list containing B items, each item is 2 np.ndarray
+        T varies from item to item.
+    """
+    mixtures, label_set = [], []
+    mix_infos, labels = batch
+    # for each utterance
+    for mix_info, label in zip(mix_infos, labels):
+        mix_path = mix_info[0]
+
+        # read wav file
+        with open(mix_path, newline="") as csvfile:
+            reader = csv.reader(csvfile)
+            row = next(reader)
+            mixtures.append(row)
+        label_set.append(labels)
+
+    return mixtures, label_set
 
 def pad_list(xs, pad_value):
     n_batch = len(xs)
@@ -411,15 +393,15 @@ def pad_list(xs, pad_value):
 if __name__ == "__main__":
     import sys
     json_dir, batch_size = sys.argv[1:3]
-    dataset = AudioDataset(json_dir, int(batch_size))
-    data_loader = AudioDataLoader(dataset, batch_size=1,
+    dataset = MyDataset(json_dir, int(batch_size))
+    data_loader = MyDataLoader(dataset, batch_size=1,
                                   num_workers=4)
     for i, batch in enumerate(data_loader):
-        mixtures, lens, sources = batch
+        mixtures, lens, labels = batch
         print(i)
         print(mixtures.size())
-        print(sources.size())
+        print(labels.size())
         print(lens)
         if i < 10:
             print(mixtures)
-            print(sources)
+            print(labels)

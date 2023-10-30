@@ -6,7 +6,10 @@ import torch
 import torch.nn as nn
 import os
 import numpy as np
+import g_mlp
 import librosa
+import data
+import pit_criterion
 import torch.optim as optim
 import csv
 import matplotlib.pyplot as plt
@@ -15,46 +18,10 @@ import sys
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 
+
 group_size = 128
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
-# 定义模型
-class BinaryClassifier(nn.Module):
-    def __init__(self):
-        super(BinaryClassifier, self).__init__()
-
-        # 定义三个全连接层
-        # self.fc1 = nn.Linear(2048, 256)
-        self.fc1 = nn.Linear(group_size, 1024)
-        self.fc2 = nn.Linear(1024, 2048)
-        # self.fc2 = nn.Linear(256, 256)
-        # self.fc3 = nn.Linear(256, 1)
-        # self.fc2_1 = nn.Linear(256, 256)
-        self.fc3 = nn.Linear(2048, 2048)
-        self.fc4 = nn.Linear(2048, 1)
-
-        # 定义ReLU和Sigmoid激活函数
-        self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
-
-    def forward(self, x):
-        # 应用第一个全连接层和ReLU激活函数
-        x = self.fc1(x)
-        x = self.relu(x)
-
-        # 应用第二个全连接层和ReLU激活函数
-        x = self.fc2(x)
-        x = self.relu(x)
-
-        x = self.fc3(x)
-        x = self.relu(x)
-
-        # 应用第三个全连接层和Sigmoid激活函数
-        x = self.fc4(x)
-        x = self.sigmoid(x)
-
-        return x
 
 
 # print(tensor_read)
