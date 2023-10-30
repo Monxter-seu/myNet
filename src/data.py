@@ -400,6 +400,7 @@ if __name__ == "__main__":
     data_loader = MyDataLoader(dataset, batch_size=1,
                                   num_workers=4)
     print('data_set===', dataset)
+    print('data_loader===', data_loader)
     for i, batch in enumerate(data_loader):
         mixtures, lens, labels = batch
         print(i)
