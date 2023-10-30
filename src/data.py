@@ -79,6 +79,8 @@ def _collate_fn(batch):
         sources_pad: B x C x T, torch.Tensor
     """
     # batch should be located in list
+    print('collate_fn')
+    print(batch)
     assert len(batch) == 1
     mixtures, label = load_mixtures_and_labels(batch[0])
 
