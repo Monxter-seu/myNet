@@ -40,7 +40,6 @@ class MyDataset(data.Dataset):
         mix_json = os.path.join(json_dir, 'mix.json')
         with open(mix_json,'r') as f:
             mix_infos = json.load(f)
-            print(mix_infos)
         sorted_mix_infos = mix_infos
 
         minibatch = []
@@ -83,7 +82,7 @@ def _collate_fn(batch):
     print('collate_fn')
     print(batch)
     assert len(batch) == 1
-    mixtures, label = load_mixtures_and_labels(batch[0])
+    mixtures = load_mixtures_and_labels(batch[0])
 
     # get batch of lengths of input sequences
     ilens = np.array([mix.shape[0] for mix in mixtures])
@@ -94,8 +93,8 @@ def _collate_fn(batch):
                              for mix in mixtures], pad_value)
     ilens = torch.from_numpy(ilens)
 
-    label_tensor = torch.from_numpy(label).float()
-    return mixtures_pad, ilens, label_tensor
+    # label_tensor = torch.from_numpy(label).float()
+    return mixtures_pad, ilens
 
 
 # class AudioDataset(data.Dataset):
