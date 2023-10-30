@@ -82,7 +82,7 @@ def _collate_fn(batch):
     print('collate_fn')
     print(batch)
     assert len(batch) == 1
-    mixtures = load_mixtures_and_labels(batch[0])
+    mixtures, label = load_mixtures_and_labels(batch[0])
 
     # get batch of lengths of input sequences
     ilens = np.array([mix.shape[0] for mix in mixtures])
@@ -93,8 +93,8 @@ def _collate_fn(batch):
                              for mix in mixtures], pad_value)
     ilens = torch.from_numpy(ilens)
 
-    # label_tensor = torch.from_numpy(label).float()
-    return mixtures_pad, ilens
+    label_tensor = torch.from_numpy(label).float()
+    return mixtures_pad, ilens, label_tensor
 
 
 # class AudioDataset(data.Dataset):
@@ -370,9 +370,9 @@ def load_mixtures_and_labels(batch):
     """
     mixtures, label_set = [], []
     print('batch========', batch)
-    mix_infos, labels = batch
+    mix_infos = batch
     # for each utterance
-    for mix_info, label in zip(mix_infos, labels):
+    for mix_info in zip(mix_infos):
         mix_path = mix_info[0]
 
         # read wav file
@@ -380,7 +380,7 @@ def load_mixtures_and_labels(batch):
             reader = csv.reader(csvfile)
             row = next(reader)
             mixtures.append(row)
-        label_set.append(labels)
+        label_set.append(mix_info[1])
 
     return mixtures, label_set
 
