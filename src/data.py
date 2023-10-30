@@ -367,6 +367,7 @@ def load_mixtures_and_labels(batch):
         T varies from item to item.
     """
     mixtures, label_set = [], []
+    print(batch)
     mix_infos, labels = batch
     # for each utterance
     for mix_info, label in zip(mix_infos, labels):
@@ -397,7 +398,6 @@ if __name__ == "__main__":
     data_loader = MyDataLoader(dataset, batch_size=1,
                                   num_workers=4)
     for i, batch in enumerate(data_loader):
-        print(batch)
         mixtures, lens, labels = batch
         print(i)
         print(mixtures.size())
