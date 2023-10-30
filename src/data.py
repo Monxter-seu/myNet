@@ -95,131 +95,131 @@ def _collate_fn(batch):
     return mixtures_pad, ilens, label_tensor
 
 
-class AudioDataset(data.Dataset):
-
-    def __init__(self, json_dir, batch_size, sample_rate=8000, segment=4.0, cv_maxlen=8.0):
-        """
-        Args:
-            json_dir: directory including mix.json, s1.json and s2.json
-            segment: duration of audio segment, when set to -1, use full audio
-
-        xxx_infos is a list and each item is a tuple (wav_file, #samples)
-        """
-        super(AudioDataset, self).__init__()
-        mix_json = os.path.join(json_dir, 'mix.json')
-        s1_json = os.path.join(json_dir, 's1.json')
-        s2_json = os.path.join(json_dir, 's2.json')
-        with open(mix_json, 'r') as f:
-            mix_infos = json.load(f)
-        with open(s1_json, 'r') as f:
-            s1_infos = json.load(f)
-        with open(s2_json, 'r') as f:
-            s2_infos = json.load(f)
-        # sort it by #samples (impl bucket)
-        def sort(infos): return sorted(
-            infos, key=lambda info: int(info[1]), reverse=True)
-        sorted_mix_infos = sort(mix_infos)
-        sorted_s1_infos = sort(s1_infos)
-        sorted_s2_infos = sort(s2_infos)
-        if segment >= 0.0:
-            # segment length and count dropped utts
-            segment_len = int(segment * sample_rate)  # 4s * 8000/s = 32000 samples
-            drop_utt, drop_len = 0, 0
-            for _, sample in sorted_mix_infos:
-                if sample < segment_len:
-                    drop_utt += 1
-                    drop_len += sample
-            print("Drop {} utts({:.2f} h) which is short than {} samples".format(
-                drop_utt, drop_len/sample_rate/36000, segment_len))
-            # generate minibach infomations
-            minibatch = []
-            start = 0
-            while True:
-                num_segments = 0
-                end = start
-                part_mix, part_s1, part_s2 = [], [], []
-                while num_segments < batch_size and end < len(sorted_mix_infos):
-                    utt_len = int(sorted_mix_infos[end][1])
-                    if utt_len >= segment_len:  # skip too short utt
-                        num_segments += math.ceil(utt_len / segment_len)
-                        # Ensure num_segments is less than batch_size
-                        if num_segments > batch_size:
-                            # if num_segments of 1st audio > batch_size, skip it
-                            if start == end: end += 1
-                            break
-                        part_mix.append(sorted_mix_infos[end])
-                        part_s1.append(sorted_s1_infos[end])
-                        part_s2.append(sorted_s2_infos[end])
-                    end += 1
-                if len(part_mix) > 0:
-                    minibatch.append([part_mix, part_s1, part_s2,
-                                      sample_rate, segment_len])
-                if end == len(sorted_mix_infos):
-                    break
-                start = end
-            self.minibatch = minibatch
-        else:  # Load full utterance but not segment
-            # generate minibach infomations
-            minibatch = []
-            start = 0
-            while True:
-                end = min(len(sorted_mix_infos), start + batch_size)
-                # Skip long audio to avoid out-of-memory issue
-                if int(sorted_mix_infos[start][1]) > cv_maxlen * sample_rate:
-                    start = end
-                    continue
-                minibatch.append([sorted_mix_infos[start:end],
-                                  sorted_s1_infos[start:end],
-                                  sorted_s2_infos[start:end],
-                                  sample_rate, segment])
-                if end == len(sorted_mix_infos):
-                    break
-                start = end
-            self.minibatch = minibatch
-
-    def __getitem__(self, index):
-        return self.minibatch[index]
-
-    def __len__(self):
-        return len(self.minibatch)
-
-
-class AudioDataLoader(data.DataLoader):
-    """
-    NOTE: just use batchsize=1 here, so drop_last=True makes no sense here.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(AudioDataLoader, self).__init__(*args, **kwargs)
-        self.collate_fn = _collate_fn
-
-
-def _collate_fn(batch):
-    """
-    Args:
-        batch: list, len(batch) = 1. See AudioDataset.__getitem__()
-    Returns:
-        mixtures_pad: B x T, torch.Tensor
-        ilens : B, torch.Tentor
-        sources_pad: B x C x T, torch.Tensor
-    """
-    # batch should be located in list
-    assert len(batch) == 1
-    mixtures, sources = load_mixtures_and_sources(batch[0])
-
-    # get batch of lengths of input sequences
-    ilens = np.array([mix.shape[0] for mix in mixtures])
-
-    # perform padding and convert to tensor
-    pad_value = 0
-    mixtures_pad = pad_list([torch.from_numpy(mix).float()
-                             for mix in mixtures], pad_value)
-    ilens = torch.from_numpy(ilens)
-    sources_pad = pad_list([torch.from_numpy(s).float()
-                            for s in sources], pad_value)
-    # N x T x C -> N x C x T
-    sources_pad = sources_pad.permute((0, 2, 1)).contiguous()
-    return mixtures_pad, ilens, sources_pad
+# class AudioDataset(data.Dataset):
+#
+#     def __init__(self, json_dir, batch_size, sample_rate=8000, segment=4.0, cv_maxlen=8.0):
+#         """
+#         Args:
+#             json_dir: directory including mix.json, s1.json and s2.json
+#             segment: duration of audio segment, when set to -1, use full audio
+#
+#         xxx_infos is a list and each item is a tuple (wav_file, #samples)
+#         """
+#         super(AudioDataset, self).__init__()
+#         mix_json = os.path.join(json_dir, 'mix.json')
+#         s1_json = os.path.join(json_dir, 's1.json')
+#         s2_json = os.path.join(json_dir, 's2.json')
+#         with open(mix_json, 'r') as f:
+#             mix_infos = json.load(f)
+#         with open(s1_json, 'r') as f:
+#             s1_infos = json.load(f)
+#         with open(s2_json, 'r') as f:
+#             s2_infos = json.load(f)
+#         # sort it by #samples (impl bucket)
+#         def sort(infos): return sorted(
+#             infos, key=lambda info: int(info[1]), reverse=True)
+#         sorted_mix_infos = sort(mix_infos)
+#         sorted_s1_infos = sort(s1_infos)
+#         sorted_s2_infos = sort(s2_infos)
+#         if segment >= 0.0:
+#             # segment length and count dropped utts
+#             segment_len = int(segment * sample_rate)  # 4s * 8000/s = 32000 samples
+#             drop_utt, drop_len = 0, 0
+#             for _, sample in sorted_mix_infos:
+#                 if sample < segment_len:
+#                     drop_utt += 1
+#                     drop_len += sample
+#             print("Drop {} utts({:.2f} h) which is short than {} samples".format(
+#                 drop_utt, drop_len/sample_rate/36000, segment_len))
+#             # generate minibach infomations
+#             minibatch = []
+#             start = 0
+#             while True:
+#                 num_segments = 0
+#                 end = start
+#                 part_mix, part_s1, part_s2 = [], [], []
+#                 while num_segments < batch_size and end < len(sorted_mix_infos):
+#                     utt_len = int(sorted_mix_infos[end][1])
+#                     if utt_len >= segment_len:  # skip too short utt
+#                         num_segments += math.ceil(utt_len / segment_len)
+#                         # Ensure num_segments is less than batch_size
+#                         if num_segments > batch_size:
+#                             # if num_segments of 1st audio > batch_size, skip it
+#                             if start == end: end += 1
+#                             break
+#                         part_mix.append(sorted_mix_infos[end])
+#                         part_s1.append(sorted_s1_infos[end])
+#                         part_s2.append(sorted_s2_infos[end])
+#                     end += 1
+#                 if len(part_mix) > 0:
+#                     minibatch.append([part_mix, part_s1, part_s2,
+#                                       sample_rate, segment_len])
+#                 if end == len(sorted_mix_infos):
+#                     break
+#                 start = end
+#             self.minibatch = minibatch
+#         else:  # Load full utterance but not segment
+#             # generate minibach infomations
+#             minibatch = []
+#             start = 0
+#             while True:
+#                 end = min(len(sorted_mix_infos), start + batch_size)
+#                 # Skip long audio to avoid out-of-memory issue
+#                 if int(sorted_mix_infos[start][1]) > cv_maxlen * sample_rate:
+#                     start = end
+#                     continue
+#                 minibatch.append([sorted_mix_infos[start:end],
+#                                   sorted_s1_infos[start:end],
+#                                   sorted_s2_infos[start:end],
+#                                   sample_rate, segment])
+#                 if end == len(sorted_mix_infos):
+#                     break
+#                 start = end
+#             self.minibatch = minibatch
+#
+#     def __getitem__(self, index):
+#         return self.minibatch[index]
+#
+#     def __len__(self):
+#         return len(self.minibatch)
+#
+#
+# class AudioDataLoader(data.DataLoader):
+#     """
+#     NOTE: just use batchsize=1 here, so drop_last=True makes no sense here.
+#     """
+#
+#     def __init__(self, *args, **kwargs):
+#         super(AudioDataLoader, self).__init__(*args, **kwargs)
+#         self.collate_fn = _collate_fn
+#
+#
+# def _collate_fn(batch):
+#     """
+#     Args:
+#         batch: list, len(batch) = 1. See AudioDataset.__getitem__()
+#     Returns:
+#         mixtures_pad: B x T, torch.Tensor
+#         ilens : B, torch.Tentor
+#         sources_pad: B x C x T, torch.Tensor
+#     """
+#     # batch should be located in list
+#     assert len(batch) == 1
+#     mixtures, sources = load_mixtures_and_sources(batch[0])
+#
+#     # get batch of lengths of input sequences
+#     ilens = np.array([mix.shape[0] for mix in mixtures])
+#
+#     # perform padding and convert to tensor
+#     pad_value = 0
+#     mixtures_pad = pad_list([torch.from_numpy(mix).float()
+#                              for mix in mixtures], pad_value)
+#     ilens = torch.from_numpy(ilens)
+#     sources_pad = pad_list([torch.from_numpy(s).float()
+#                             for s in sources], pad_value)
+#     # N x T x C -> N x C x T
+#     sources_pad = sources_pad.permute((0, 2, 1)).contiguous()
+#     return mixtures_pad, ilens, sources_pad
 
 
 # Eval data part
