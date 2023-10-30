@@ -33,7 +33,7 @@ import librosa
 # json中应该包含
 
 
-class MyDataset(data.dataset):
+class MyDataset(data.Dataset):
 
     def __init__(self, json_dir, batch_size):
         super(MyDataset, self).__init__()
