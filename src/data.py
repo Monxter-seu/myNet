@@ -402,11 +402,11 @@ if __name__ == "__main__":
     print('data_set===', dataset)
     print('data_loader===', data_loader)
     for i, batch in enumerate(data_loader):
-        mixtures, lens, labels = batch
+        mixtures, lens = batch
         print(i)
         print(mixtures.size())
-        print(labels.size())
+        #print(labels.size())
         print(lens)
         if i < 10:
             print(mixtures)
-            print(labels)
+            #print(labels)
