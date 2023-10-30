@@ -399,6 +399,7 @@ if __name__ == "__main__":
     dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', 10)
     data_loader = MyDataLoader(dataset, batch_size=1,
                                   num_workers=4)
+    print('data_set===',dataset)
     for i, batch in enumerate(data_loader):
         mixtures, lens, labels = batch
         print(i)
