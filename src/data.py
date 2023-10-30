@@ -368,13 +368,14 @@ def load_mixtures_and_labels(batch):
         labels: a list containing B items, each item is 2 np.ndarray
         T varies from item to item.
     """
+    print('load_mixtures_and_labels')
     mixtures, label_set = [], []
     print('batch========', batch)
     mix_infos = batch
     # for each utterance
     for mix_info in zip(mix_infos):
         mix_path = mix_info[0]
-        print('mix_info',mix_info)
+        print('mix_info====', mix_info)
         # read wav file
         with open(mix_path, newline="") as csvfile:
             reader = csv.reader(csvfile)
