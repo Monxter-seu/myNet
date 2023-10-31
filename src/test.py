@@ -58,7 +58,7 @@ if __name__ == "__main__":
     model = model.cuda()
 
     # 定义损失函数和优化器
-    criterion = new_loss()
+    # criterion = new_loss()
     optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
     train_dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', 10)
@@ -73,12 +73,12 @@ if __name__ == "__main__":
         # print('train_loader.shape',train_loader.shape)
         for data, labels in train_loader:
             # 将数据和标签转换为张量
-            data = data.float()
-            labels = labels.float()
+            data = data.cuda()
+            labels =labels.cuda()
 
             # 向前传递
             outputs = model(data)
-            loss = criterion(outputs, labels.unsqueeze(1))
+            loss = new_loss(outputs, labels)
 
             # 反向传播和优化
             optimizer.zero_grad()
