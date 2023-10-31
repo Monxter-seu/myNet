@@ -62,7 +62,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
     train_dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', 4)
-    train_loader = MyDataset(train_dataset, batch_size=1)
+    train_loader = MyDataLoader(train_dataset, batch_size=1)
     # 训练模型
     num_epochs = 120
     for epoch in range(num_epochs):
