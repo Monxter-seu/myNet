@@ -46,12 +46,12 @@ class MyDataset(data.Dataset):
         start = 0
         while True:
             end = min(len(sorted_mix_infos), start + batch_size)
-            minibatch.append([sorted_mix_infos[start:end]])
+            minibatch.append(sorted_mix_infos[start:end])
             if end == len(sorted_mix_infos):
                 break
             start = end
-            print(minibatch[0][0])
         self.minibatch = minibatch
+        
 
     def __getitem__(self, index):
         return self.minibatch[index]
@@ -80,22 +80,19 @@ def _collate_fn(batch):
         sources_pad: B x C x T, torch.Tensor
     """
     # batch should be located in list
-    print('collate_fn')
-    print(batch)
     assert len(batch) == 1
     mixtures, label = load_mixtures_and_labels(batch[0])
 
     # get batch of lengths of input sequences
-    ilens = np.array([mix.shape[0] for mix in mixtures])
+    #ilens = np.array([mix.shape[0] for mix in mixtures])
 
     # perform padding and convert to tensor
     pad_value = 0
-    mixtures_pad = pad_list([torch.from_numpy(mix).float()
-                             for mix in mixtures], pad_value)
-    ilens = torch.from_numpy(ilens)
+    mixtures_pad = torch.from_numpy(mixtures).float()
+    #ilens = torch.from_numpy(ilens)
 
     label_tensor = torch.from_numpy(label).float()
-    return mixtures_pad, ilens, label_tensor
+    return mixtures_pad, label_tensor
 
 
 # class AudioDataset(data.Dataset):
@@ -353,10 +350,8 @@ def load_mixtures(batch):
     for mix_info in mix_infos:
         mix_path = mix_info[0]
         # read wav file
-        with open(mix_path, newline="") as csvfile:
-            reader = csv.reader(csvfile)
-            row = next(reader)
-            mixtures.append(row)
+        row = np.loadtxt(mixpath, delimiter=",", dtype=np.float32)
+        mixtures.append(row)
         filenames.append(mix_path)
     return mixtures, filenames
 
@@ -374,16 +369,15 @@ def load_mixtures_and_labels(batch):
     print('batch========', batch)
     mix_infos = batch
     # for each utterance
-    for mix_info in zip(mix_infos):
+    for mix_info in mix_infos:
         mix_path = mix_info[0]
-        print('mix_info====', mix_info)
+        label_list = mix_info[1]
         # read wav file
-        with open(mix_path, newline="") as csvfile:
-            reader = csv.reader(csvfile)
-            row = next(reader)
-            mixtures.append(row)
-        label_set.append(mix_info[1])
-
+        row = np.loadtxt(mix_path, delimiter=",", dtype=np.float32)
+        mixtures.append(row)
+        label_set.append(np.array([int(x) for x in label_list]))
+    mixtures = np.array(mixtures)
+    label_set = np.array(label_set)
     return mixtures, label_set
 
 def pad_list(xs, pad_value):
@@ -401,7 +395,7 @@ if __name__ == "__main__":
     dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', 10)
     data_loader = MyDataLoader(dataset, batch_size=1,
                                   num_workers=4)
-    print('data_set===', dataset)
+    print('data_set_len===', len(dataset))
     print('data_loader===', data_loader)
     for i, batch in enumerate(data_loader):
         mixtures, lens = batch
