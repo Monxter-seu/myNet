@@ -50,7 +50,7 @@ class MyDataset(data.Dataset):
             if end == len(sorted_mix_infos):
                 break
             start = end
-            print(minibatch)
+            print(minibatch[0])
         self.minibatch = minibatch
 
     def __getitem__(self, index):
