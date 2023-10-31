@@ -364,9 +364,8 @@ def load_mixtures_and_labels(batch):
         labels: a list containing B items, each item is 2 np.ndarray
         T varies from item to item.
     """
-    print('load_mixtures_and_labels')
+
     mixtures, label_set = [], []
-    print('batch========', batch)
     mix_infos = batch
     # for each utterance
     for mix_info in mix_infos:
