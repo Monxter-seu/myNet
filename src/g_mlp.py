@@ -51,8 +51,8 @@ class gMLP(nn.Module):
 
         """（中间是否要转化为频域？？）分类器组件
         """
-        self.classifier0 = BinaryClassifier(64000)
-        self.classifier1 = BinaryClassifier(64000)
+        self.classifier0 = MultiClassifier(64000, 128)
+        self.classifier1 = MultiClassifier(64000, 128)
 
         # init
         for p in self.parameters():
@@ -382,6 +382,46 @@ class BinaryClassifier(nn.Module):
         x = self.fc4(x)
         x = self.sigmoid(x)
         return x
+
+
+# define Multiclassifier
+class MultiClassifier(nn.Module):
+    def __init__(self, length, fft_length):
+        super(BinaryClassifier, self).__init__()
+        self.fft_length = fft_length
+        self.length = length
+        self.group_size = 128
+        # 定义三个全连接层
+        # self.fc1 = nn.Linear(2048, 256)
+        self.fc1 = nn.Linear(length, 1024)
+        self.fc2 = nn.Linear(1024, 2048)
+        self.fc3 = nn.Linear(2048, 6)
+
+    def forward(self, x):
+        # 应用第一个全连接层和ReLU激活函数
+        group_num = self.length // self.group_size
+        num_elements = group_num * self.group_size
+
+        # 将张量裁剪为要保留的元素数量
+        x = x[:num_elements]
+
+        # 将张量重塑为形状为[31, 2048]的张量
+        mixture_reshaped = x.reshape(group_num, self.group_size)
+
+        # 对第二个维度执行FFT
+        mixture_fft = torch.fft.fftn(mixture_reshaped, dim=1)
+        mixture_fft = torch.abs(mixture_fft)
+        # 计算形状为[32, 2048]的张量的平均值
+        x = torch.mean(mixture_fft, dim=0)
+        x = self.fc1(x)
+        x = self.relu(x)
+        # 应用第二个全连接层和ReLU激活函数
+        x = self.fc2(x)
+        x = self.relu(x)
+        # 应用第三个全连接层和ReLU激活函数
+        x = self.fc3(x)
+        return x
+
 
 if __name__ == '__main__':
     

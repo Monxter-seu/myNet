@@ -64,12 +64,14 @@ if __name__ == "__main__":
     train_dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', 4)
     train_loader = MyDataLoader(train_dataset, batch_size=1)
     # 训练模型
-    num_epochs = 120
+    num_epochs = 30
     for epoch in range(num_epochs):
         # 训练模式
         model.train()
         train_loss = 0
-        train_correct = 0
+        train_correct0 = 0
+        train_correct1 = 0
+        total_samples = 0
         # print('train_loader.shape',train_loader.shape)
         for data, labels in train_loader:
             # 将数据和标签转换为张量
@@ -86,14 +88,20 @@ if __name__ == "__main__":
             optimizer.step()
 
             # 计算损失和准确率
-            train_loss += loss.item() * data.size(0)
-            predicted = (outputs > 0.5).float()
-            train_correct += (predicted == labels.unsqueeze(1)).sum().item()
+            train_loss += loss.item()
+            _, predicted0 = torch.max(outputs[0], 1)
+            _, predicted1 = torch.max(outputs[1], 1)
+            train_correct0 += (predicted0 == labels[0]).sum().item()
+            train_correct1 += (predicted1 == labels[1]).sum().item()
+            total_samples += labels.size(0)
 
         train_loss /= len(train_loader.dataset)
-        train_accuracy = train_correct / len(train_loader.dataset)
+        train_accuracy0 = train_correct0 / total_samples
+        train_accuracy1 = train_correct1 / total_samples
+
         print('train_loss', train_loss)
-        print('train_accuracy', train_accuracy)
+        print('train_accuracy0', train_accuracy0)
+        print('train_accuracy1', train_accuracy1)
 
     # # 测试模式
     # model.eval()
