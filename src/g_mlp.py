@@ -404,7 +404,7 @@ class MultiClassifier(nn.Module):
         num_elements = group_num * self.group_size
 
         # 将张量裁剪为要保留的元素数量
-        x = x.reshape(x.size(0), group_num,-1)
+        x = x.reshape(x.size(0), group_num, -1)
 
         # 将张量重塑为形状为[B,n, 128]的张量
         mixture_reshaped = x.reshape(group_num, self.group_size)
