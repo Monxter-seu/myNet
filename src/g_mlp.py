@@ -397,6 +397,7 @@ class MultiClassifier(nn.Module):
         self.fc1 = nn.Linear(fft_length, 1024)
         self.fc2 = nn.Linear(1024, 2048)
         self.fc3 = nn.Linear(2048, 6)
+        self.relu = nn.ReLU()
 
     def forward(self, x):
         # 应用第一个全连接层和ReLU激活函数
