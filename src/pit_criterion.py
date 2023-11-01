@@ -16,8 +16,8 @@ def new_loss(source_label, estimate_label):
 
     criterion = torch.nn.CrossEntropyLoss()
 
-    loss_first_class = criterion(source_label, estimate_label)
-    loss_second_class = criterion(source_label, estimate_label)
+    loss_first_class = criterion(source_first_class, estimate_first_class)
+    loss_second_class = criterion(source_second_class, estimate_second_class)
 
     total_loss = loss_first_class + loss_second_class
 
