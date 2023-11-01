@@ -387,7 +387,7 @@ class BinaryClassifier(nn.Module):
 # define Multiclassifier
 class MultiClassifier(nn.Module):
     def __init__(self, length, fft_length):
-        super(BinaryClassifier, self).__init__()
+        super(MultiClassifier, self).__init__()
         self.fft_length = fft_length
         self.length = length
         self.group_size = 128
