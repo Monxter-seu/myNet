@@ -132,22 +132,22 @@ def get_mask(source, source_lengths):
 
 
 if __name__ == "__main__":
-    torch.manual_seed(123)
-    B, C, T = 2, 3, 12
-    # fake data
-    source = torch.randint(4, (B, C, T))
-    estimate_source = torch.randint(4, (B, C, T))
-    source[1, :, -3:] = 0
-    estimate_source[1, :, -3:] = 0
-    source_lengths = torch.LongTensor([T, T-3])
-    print('source', source)
-    print('estimate_source', estimate_source)
-    print('source_lengths', source_lengths)
-    
-    loss, max_snr, estimate_source, reorder_estimate_source = cal_loss(source, estimate_source, source_lengths)
-    print('loss', loss)
-    print('max_snr', max_snr)
-    print('reorder_estimate_source', reorder_estimate_source)
+    # torch.manual_seed(123)
+    # B, C, T = 2, 3, 12
+    # # fake data
+    # source = torch.randint(4, (B, C, T))
+    # estimate_source = torch.randint(4, (B, C, T))
+    # source[1, :, -3:] = 0
+    # estimate_source[1, :, -3:] = 0
+    # source_lengths = torch.LongTensor([T, T-3])
+    # print('source', source)
+    # print('estimate_source', estimate_source)
+    # print('source_lengths', source_lengths)
+    #
+    # loss, max_snr, estimate_source, reorder_estimate_source = cal_loss(source, estimate_source, source_lengths)
+    # print('loss', loss)
+    # print('max_snr', max_snr)
+    # print('reorder_estimate_source', reorder_estimate_source)
 
     a = torch.tensor([4, 2, 6])
     b = torch.tensor([4, 2])
