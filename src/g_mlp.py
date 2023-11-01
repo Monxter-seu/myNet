@@ -91,7 +91,6 @@ class gMLP(nn.Module):
         est_source = F.pad(est_source, (0, T_origin - T_conv))
         """est_source是[M,C,T]的格式
         """
-        print('est_source.size==',est_source.shape)
         channel_0 = est_source[:, 0, :]
         channel_1 = est_source[:, 1, :]
         classifier_output0 = self.classifier0(channel_0)
