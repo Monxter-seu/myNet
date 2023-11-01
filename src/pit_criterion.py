@@ -149,7 +149,7 @@ if __name__ == "__main__":
     # print('max_snr', max_snr)
     # print('reorder_estimate_source', reorder_estimate_source)
 
-    a = torch.ones(4, 2, 6)
-    b = torch.ones(4, 2)
+    a = torch.ones(4, 2, 6, dtype=torch.float)
+    b = torch.ones(4, 2, dtype=torch.float)
     losss = new_loss(a, b)
     print('new_loss===', losss)
