@@ -393,8 +393,8 @@ class MultiClassifier(nn.Module):
         self.length = length
         self.group_size = 128
         # 定义三个全连接层
-        # self.fc1 = nn.Linear(2048, 256)
-        self.fc1 = nn.Linear(length, 1024)
+        # self.fc1 = nn.Linear(fft_length, 256)
+        self.fc1 = nn.Linear(fft_length, 1024)
         self.fc2 = nn.Linear(1024, 2048)
         self.fc3 = nn.Linear(2048, 6)
 
