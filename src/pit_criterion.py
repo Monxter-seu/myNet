@@ -13,8 +13,8 @@ def new_loss(source_label, estimate_label):
     print('cal_loss')
     source_label = source_label.float()
     estimate_label = estimate_label.float()
-    source_first_class = source_label[:, 0]
-    source_second_class = source_label[:, 1]
+    source_first_class = source_label[:, 0, :]
+    source_second_class = source_label[:, 1, :]
     estimate_first_class = estimate_label[:, 0]
     estimate_second_class = estimate_label[:, 1]
 
@@ -148,3 +148,8 @@ if __name__ == "__main__":
     print('loss', loss)
     print('max_snr', max_snr)
     print('reorder_estimate_source', reorder_estimate_source)
+
+    a = torch.tensor([4, 2, 6])
+    b = torch.tensor([4, 2])
+    losssssss = new_loss(a, b)
+    print('new_loss===', lossss)
