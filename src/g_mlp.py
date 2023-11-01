@@ -95,7 +95,8 @@ class gMLP(nn.Module):
         channel_1 = est_source[:, 1, :]
         classifier_output0 = self.classifier0(channel_0)
         classifier_output1 = self.classifier1(channel_1)
-        combined_classifier_output = torch.cat((classifier_output0, classifier_output1), dim=1)
+        combined_classifier_output = torch.cat((classifier_output0.unsqueeze(1), classifier_output1.unsqueeze(1))
+                                               , dim=1)
         return combined_classifier_output
 
     @classmethod
@@ -403,16 +404,16 @@ class MultiClassifier(nn.Module):
         num_elements = group_num * self.group_size
 
         # 将张量裁剪为要保留的元素数量
-        x = x[:num_elements]
+        x = x.reshape(x.size(0), group_num,-1)
 
-        # 将张量重塑为形状为[31, 2048]的张量
+        # 将张量重塑为形状为[B,n, 128]的张量
         mixture_reshaped = x.reshape(group_num, self.group_size)
 
         # 对第二个维度执行FFT
-        mixture_fft = torch.fft.fftn(mixture_reshaped, dim=1)
+        mixture_fft = torch.fft.fftn(mixture_reshaped, dim=2)
         mixture_fft = torch.abs(mixture_fft)
-        # 计算形状为[32, 2048]的张量的平均值
-        x = torch.mean(mixture_fft, dim=0)
+        # 计算形状为[B,n, 128]的张量的平均值
+        x = torch.mean(mixture_fft, dim=1)
         x = self.fc1(x)
         x = self.relu(x)
         # 应用第二个全连接层和ReLU激活函数
