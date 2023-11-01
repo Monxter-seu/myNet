@@ -403,17 +403,14 @@ class MultiClassifier(nn.Module):
         group_num = self.length // self.group_size
         num_elements = group_num * self.group_size
 
-        # 将张量裁剪为要保留的元素数量
+        # 将张量重塑为形状为[B,n, 128]的张量
         x = x.reshape(x.size(0), group_num, -1)
 
-        # 将张量重塑为形状为[B,n, 128]的张量
-        mixture_reshaped = x.reshape(group_num, self.group_size)
-
         # 对第二个维度执行FFT
-        mixture_fft = torch.fft.fftn(mixture_reshaped, dim=2)
-        mixture_fft = torch.abs(mixture_fft)
+        x = torch.fft.fftn(x, dim=2)
+        x = torch.abs(x)
         # 计算形状为[B,n, 128]的张量的平均值
-        x = torch.mean(mixture_fft, dim=1)
+        x = torch.mean(x, dim=1)
         x = self.fc1(x)
         x = self.relu(x)
         # 应用第二个全连接层和ReLU激活函数
