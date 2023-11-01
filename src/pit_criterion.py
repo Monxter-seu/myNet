@@ -9,6 +9,8 @@ import torch.nn.functional as F
 EPS = 1e-8
 
 def new_loss(source_label, estimate_label):
+    source_label = source_label.float()
+    estimate_label = estimate_label.float()
     source_first_class = source_label[:, 0]
     source_second_class = source_label[:, 1]
     estimate_first_class = estimate_label[:, 0]
