@@ -9,8 +9,8 @@ import torch.nn.functional as F
 EPS = 1e-8
 
 def new_loss(source_label, estimate_label):
-
-    print('cal_loss')
+    source_label = source_label.float()
+    estimate_label = estimate_label.long()
     source_first_class = source_label[:, 0, :]
     source_second_class = source_label[:, 1, :]
     estimate_first_class = estimate_label[:, 0]
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # print('max_snr', max_snr)
     # print('reorder_estimate_source', reorder_estimate_source)
 
-    a = torch.ones(4, 2, 6, dtype=torch.long)
-    b = torch.ones(4, 2, dtype=torch.long)
+    a = torch.ones(4, 2, 6)
+    b = torch.ones(4, 2)
     losss = new_loss(a, b)
     print('new_loss===', losss)
