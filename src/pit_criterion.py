@@ -151,5 +151,5 @@ if __name__ == "__main__":
 
     a = torch.tensor([4, 2, 6])
     b = torch.tensor([4, 2])
-    losssssss = new_loss(a, b)
-    print('new_loss===', lossss)
+    losss = new_loss(a, b)
+    print('new_loss===', losss)
