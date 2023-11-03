@@ -40,10 +40,10 @@ if __name__ == "__main__":
     # reader = csv.reader(file)
     # row = next(reader)
     # tensor_read = torch.from_numpy(np.array(row, dtype=np.float32))
-    N = 1024
+    N = 512
     L = 40
-    B = 1024
-    H = 1024
+    B = 512
+    H = 256
     P = 3
     X = 8
     R = 4
