@@ -20,7 +20,7 @@ def new_loss(source_label, estimate_label):
     criterion1 = torch.nn.BCELoss()
     criterion2 = torch.nn.CrossEntropyLoss()
 
-    estimate_second_class = estimate_second_class.float()
+    estimate_first_class = estimate_first_class.float()
 
     loss_first_class = criterion1(source_first_class, estimate_first_class)
     loss_second_class = criterion2(source_second_class, estimate_second_class)
