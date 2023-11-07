@@ -46,7 +46,7 @@ if __name__ == "__main__":
     H = 32
     P = 3
     X = 8
-    R = 4
+    R = 3
     norm_type = 'gLN'
     causal = 0
     mask_nonlinear = 'relu'
@@ -91,21 +91,17 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
 
+            splited_outputs0 = outputs[:, 0]
+            splited_outputs1 = outputs[:, 1:6]
+
             # 计算损失和准确率
-            train_loss += loss.item()* data.size(0)
-            #print('outputs===',outputs)
-            #print('labels[0]====',labels)
-            _, predicted0 = torch.max(outputs[:,0], 1)
+            train_loss += loss.item() * data.size(0)
+            predicted0 = (outputs > 0.5).float()
             _, predicted1 = torch.max(outputs[:,1], 1)
-            #print('predicted0===',predicted0)
-            #print('predicted1===',predicted1)
-            #print('labels[0]===',labels[0])
-            #print('labels[1]===',labels[1])
-            #print('predicted0 == labels[0]',predicted0 == labels[:,0])
-            train_correct0 += (predicted0 == labels[:,0]).int().sum().item()
+            train_correct0 += (predicted0 == labels.unsqueeze(1)).sum().item()
             train_correct1 += (predicted1 == labels[:,1]).int().sum().item()
             total_samples += labels.size(0)
-            #print('total_samples===',total_samples)
+
             
         train_loss /= len(train_loader.dataset)
         train_accuracy0 = train_correct0 / total_samples
@@ -130,11 +126,14 @@ if __name__ == "__main__":
                 # 向前传递
                 outputs = model(data)
                 loss = new_loss(outputs, labels)
+
+                splited_outputs0 = outputs[:, 0]
+                splited_outputs1 = outputs[:, 1:6]
         
                 cv_loss += loss.item() * data.size(0)
-                _, predicted0 = torch.max(outputs[:,0], 1)
+                predicted0 = (outputs > 0.5).float()
                 _, predicted1 = torch.max(outputs[:,1], 1)
-                cv_correct0 += (predicted0 == labels[:,0]).int().sum().item()
+                cv_correct0 += (predicted0 == labels.unsqueeze(1)).sum().item()
                 cv_correct1 += (predicted1 == labels[:,1]).int().sum().item()
                 total_samples += labels.size(0)
             cv_loss /= len(cv_loader.dataset)
@@ -164,11 +163,14 @@ if __name__ == "__main__":
             # 向前传递
             outputs = model(data)
             loss = new_loss(outputs, labels)
+
+            splited_outputs0 = outputs[:, 0]
+            splited_outputs1 = outputs[:, 1:6]
     
             test_loss += loss.item() * data.size(0)
-            _, predicted0 = torch.max(outputs[:,0], 1)
+            predicted0 = (outputs > 0.5).float()
             _, predicted1 = torch.max(outputs[:,1], 1)
-            test_correct0 += (predicted0 == labels[:,0]).int().sum().item()
+            test_correct0 += (predicted0 == labels.unsqueeze(1)).sum().item()
             test_correct1 += (predicted1 == labels[:,1]).int().sum().item()
             total_samples += labels.size(0)
         test_loss /= len(train_loader.dataset)
