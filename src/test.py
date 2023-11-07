@@ -91,7 +91,7 @@ if __name__ == "__main__":
             loss.backward()
             optimizer.step()
 
-            splited_outputs0 = outputs[:, 0]
+            splited_outputs0 = outputs[:, 0].unsqueeze(1)
             splited_outputs1 = outputs[:, 1:6]
 
             # 计算损失和准确率
@@ -127,7 +127,7 @@ if __name__ == "__main__":
                 outputs = model(data)
                 loss = new_loss(outputs, labels)
 
-                splited_outputs0 = outputs[:, 0]
+                splited_outputs0 = outputs[:, 0].unsqueeze(1)
                 splited_outputs1 = outputs[:, 1:6]
         
                 cv_loss += loss.item() * data.size(0)
@@ -164,7 +164,7 @@ if __name__ == "__main__":
             outputs = model(data)
             loss = new_loss(outputs, labels)
 
-            splited_outputs0 = outputs[:, 0]
+            splited_outputs0 = outputs[:, 0].unsqueeze(1)
             splited_outputs1 = outputs[:, 1:6]
     
             test_loss += loss.item() * data.size(0)
