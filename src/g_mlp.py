@@ -95,8 +95,8 @@ class gMLP(nn.Module):
         channel_1 = est_source[:, 1, :]
         classifier_output0 = self.classifier0(channel_0)
         classifier_output1 = self.classifier1(channel_1)
-        print('classifier_output0====', classifier_output0)
-        print('classifier_output1=====', classifier_output1)
+        print('classifier_output0====', classifier_output0.shape)
+        print('classifier_output1=====', classifier_output1.shape)
         combined_classifier_output = torch.cat((classifier_output0, classifier_output1), dim=1)
         return combined_classifier_output
 
@@ -458,5 +458,5 @@ if __name__ == '__main__':
     print(output)
     splited_outputs0 = output[:, 0]
     splited_outputs1 = output[:, 1:6]
-    print(splited_outputs0)
-    print(splited_outputs1)
+    print(splited_outputs0.shape)
+    print(splited_outputs1.shape)
