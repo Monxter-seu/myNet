@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
             # 反向传播和优化
             optimizer.zero_grad()
-            #loss.backward()
+            loss.backward()
             optimizer.step()
 
             splited_outputs0 = outputs[:, 0].unsqueeze(1)
