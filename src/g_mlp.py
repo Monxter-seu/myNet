@@ -95,6 +95,8 @@ class gMLP(nn.Module):
         channel_1 = est_source[:, 1, :]
         classifier_output0 = self.classifier0(channel_0)
         classifier_output1 = self.classifier1(channel_1)
+        print('classifier_output0====', classifier_output0)
+        print('classifier_output1=====', classifier_output1)
         combined_classifier_output = torch.cat((classifier_output0, classifier_output1), dim=1)
         return combined_classifier_output
 
