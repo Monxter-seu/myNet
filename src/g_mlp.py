@@ -370,7 +370,7 @@ class BinaryClassifier(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        group_s = 128
+        group_s = 500
         x = x.reshape(x.size(0), group_s, -1)
         # 对第二个维度执行FFT
         x = torch.fft.fftn(x, dim=2)
