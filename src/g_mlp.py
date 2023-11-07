@@ -458,5 +458,6 @@ if __name__ == '__main__':
     print(output)
     splited_outputs0 = output[:, 0].unsqueeze(1)
     splited_outputs1 = output[:, 1:6]
+    print(splited_outputs0)
     print(splited_outputs0.shape)
     print(splited_outputs1.shape)
