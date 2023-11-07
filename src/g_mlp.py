@@ -51,7 +51,7 @@ class gMLP(nn.Module):
 
         """（中间是否要转化为频域？？）分类器组件
         """
-        self.classifier0 = MultiClassifier(64000, 128)
+        self.classifier0 = BinaryClassifier(128)
         self.classifier1 = MultiClassifier(64000, 128)
 
         # init
@@ -362,14 +362,21 @@ class BinaryClassifier(nn.Module):
         # self.fc2 = nn.Linear(256, 256)
         # self.fc3 = nn.Linear(256, 1)
         # self.fc2_1 = nn.Linear(256, 256)
-        self.fc3 = nn.Linear(2048, 2048)
-        self.fc4 = nn.Linear(2048, 1)
+        #self.fc3 = nn.Linear(2048, 2048)
+        self.fc3 = nn.Linear(2048, 1)
 
         # 定义ReLU和Sigmoid激活函数
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
+        group_s = 128
+        x = x.reshape(x.size(0), group_s, -1)
+        # 对第二个维度执行FFT
+        x = torch.fft.fftn(x, dim=2)
+        x = torch.abs(x)
+        # 计算形状为[B,n, 128]的张量的平均值
+        x = torch.mean(x, dim=1)
         # 应用第一个全连接层和ReLU激活函数
         x = self.fc1(x)
         x = self.relu(x)
@@ -378,9 +385,6 @@ class BinaryClassifier(nn.Module):
         x = self.relu(x)
         # 应用第三个全连接层和ReLU激活函数
         x = self.fc3(x)
-        x = self.relu(x)
-        # 应用第四个全连接层和Sigmoid激活函数
-        x = self.fc4(x)
         x = self.sigmoid(x)
         return x
 
