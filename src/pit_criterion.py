@@ -10,12 +10,10 @@ EPS = 1e-8
 
 def new_loss(source_label, estimate_label):
     #source为网络计算结果，estimate为直接输入
-    source_label = source_label.float()
-    estimate_label = estimate_label.long()
     source_first_class = source_label[:, 0].unsqueeze(1)
     source_second_class = source_label[:, 1:6]
     estimate_first_class = estimate_label[:, 0].unsqueeze(1).float()
-    estimate_second_class = estimate_label[:, 1]
+    estimate_second_class = estimate_label[:, 1].long()
 
     criterion1 = torch.nn.BCELoss()
     criterion2 = torch.nn.CrossEntropyLoss()
