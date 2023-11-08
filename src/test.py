@@ -92,7 +92,7 @@ if __name__ == "__main__":
             optimizer.step()
 
             splited_outputs0 = outputs[:, 0].unsqueeze(1)
-            splited_outputs1 = outputs[:, 1:6]
+            splited_outputs1 = outputs[:, 1:7]
 
             # 计算损失和准确率
             train_loss += loss.item() * data.size(0)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
                 loss = new_loss(outputs, labels)
 
                 splited_outputs0 = outputs[:, 0].unsqueeze(1)
-                splited_outputs1 = outputs[:, 1:6]
+                splited_outputs1 = outputs[:, 1:7]
         
                 cv_loss += loss.item() * data.size(0)
                 predicted0 = (splited_outputs0 > 0.5).float()
@@ -165,13 +165,13 @@ if __name__ == "__main__":
             loss = new_loss(outputs, labels)
 
             splited_outputs0 = outputs[:, 0].unsqueeze(1)
-            splited_outputs1 = outputs[:, 1:6]
+            splited_outputs1 = outputs[:, 1:7]
     
             test_loss += loss.item() * data.size(0)
             predicted0 = (splited_outputs0 > 0.5).float()
             _, predicted1 = torch.max(splited_outputs1, 1)
-            test_correct0 += (predicted0 == labels[:,0].unsqueeze(1)).sum().item()
-            test_correct1 += (predicted1 == labels[:,1]).int().sum().item()
+            test_correct0 += (predicted0 == labels[:, 0].unsqueeze(1)).sum().item()
+            test_correct1 += (predicted1 == labels[:, 1]).int().sum().item()
             total_samples += labels.size(0)
         test_loss /= len(train_loader.dataset)
         test_accuracy0 = test_correct0 / total_samples
