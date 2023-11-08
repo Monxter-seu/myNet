@@ -25,15 +25,15 @@ def new_loss(source_label, estimate_label):
     #print('source_first_class', source_first_class)
     #print('estimate_first_class', estimate_first_class)
 
-    #loss_first_class = criterion1(source_first_class, estimate_first_class)
+    loss_first_class = criterion1(source_first_class, estimate_first_class)
     #print('loss_first_class',loss_first_class)
-    loss_second_class = criterion2(source_second_class, estimate_second_class)
+    #loss_second_class = criterion2(source_second_class, estimate_second_class)
     #print('loss_second_class',loss_second_class)
 
     #total_loss = loss_first_class + loss_second_class
 
     #return total_loss
-    return loss_second_class
+    return loss_first_class
 
 def cal_loss(source, estimate_source, source_lengths):
     """
