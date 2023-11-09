@@ -90,7 +90,7 @@ class gMLP(nn.Module):
         est_source = self.decoder(mixture_w, est_mask)
 
         decoder_time = time.time()
-        print('separater_time====', decoder_time-separator_time)
+        print('decoder_time====', decoder_time-separator_time)
         
 
         # T changed after conv1d in encoder, fix it here
@@ -109,7 +109,7 @@ class gMLP(nn.Module):
         classifier_output1 = self.classifier1(channel_1)
 
         classifier_time = time.time()
-        print('separater_time====', classifier_time-decoder_time, flush=True)
+        print('classifier_time====', classifier_time-decoder_time, flush=True)
 
         combined_classifier_output = torch.cat((classifier_output0, classifier_output1), dim=1)
         return combined_classifier_output
