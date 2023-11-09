@@ -46,7 +46,7 @@ if __name__ == "__main__":
     H = 32
     P = 3
     X = 8
-    R = 3
+    R = 2
     norm_type = 'gLN'
     causal = 0
     mask_nonlinear = 'relu'
@@ -59,13 +59,13 @@ if __name__ == "__main__":
 
     # 定义损失函数和优化器
     # criterion = new_loss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
-    train_dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', batch_size=4)
+    train_dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', batch_size=16)
     train_loader = MyDataLoader(train_dataset, batch_size=1, shuffle=True)
-    cv_dataset = MyDataset('D:\\csvProcess\\testout\\tt\\', batch_size=4)
+    cv_dataset = MyDataset('D:\\csvProcess\\testout\\tt\\', batch_size=16)
     cv_loader = MyDataLoader(cv_dataset, batch_size=1, shuffle=True)
-    test_dataset = MyDataset('D:\\csvProcess\\testout\\cv\\', batch_size=4)
+    test_dataset = MyDataset('D:\\csvProcess\\testout\\cv\\', batch_size=16)
     test_loader = MyDataLoader(test_dataset, batch_size=1, shuffle=True)
     # 训练模型
     num_epochs = 30
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         print('============')
         print('train_loss', train_loss)
         print('train_accuracy0', train_accuracy0)
-        print('train_accuracy1', train_accuracy1)  
+        print('train_accuracy1', train_accuracy1,flush=True)  
         
         
         model.eval()
