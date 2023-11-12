@@ -17,6 +17,7 @@ import torch.nn.functional as F
 import sys
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 from g_mlp import gMLP
 from pit_criterion import new_loss
@@ -62,22 +63,24 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
     train_dataset = MyDataset('D:\\csvProcess\\testout\\tr\\', batch_size=16)
-    train_loader = MyDataLoader(train_dataset, batch_size=1, shuffle=True)
+    train_loader = MyDataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=4)
     cv_dataset = MyDataset('D:\\csvProcess\\testout\\tt\\', batch_size=16)
-    cv_loader = MyDataLoader(cv_dataset, batch_size=1, shuffle=True)
+    cv_loader = MyDataLoader(cv_dataset, batch_size=1, shuffle=True, num_workers=4)
     test_dataset = MyDataset('D:\\csvProcess\\testout\\cv\\', batch_size=16)
-    test_loader = MyDataLoader(test_dataset, batch_size=1, shuffle=True)
+    test_loader = MyDataLoader(test_dataset, batch_size=1, shuffle=True, num_workers=4)
     # 训练模型
     num_epochs = 30
     for epoch in range(num_epochs):
         # 训练模式
+        #start_time = time.time()
+        #count = 0
         model.train()
         train_loss = 0
         train_correct0 = 0
         train_correct1 = 0
         total_samples = 0
         # print('train_loader.shape',train_loader.shape)
-        for data, labels in train_loader:
+        for data, labels in tqdm(train_loader):
             # 将数据和标签转换为张量
             data = data.cuda()
             labels =labels.cuda()
@@ -101,6 +104,8 @@ if __name__ == "__main__":
             train_correct0 += (predicted0 == labels[:,0].unsqueeze(1)).sum().item()
             train_correct1 += (predicted1 == labels[:,1]).int().sum().item()
             total_samples += labels.size(0)
+            
+            #count++
 
             
         train_loss /= len(train_loader.dataset)

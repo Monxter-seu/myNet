@@ -80,7 +80,6 @@ def _collate_fn(batch):
         ilens : B, torch.Tentor
         sources_pad: B x C x T, torch.Tensor
     """
-    start_time = time.time()
     # batch should be located in list
     assert len(batch) == 1
     mixtures, label = load_mixtures_and_labels(batch[0])
@@ -94,7 +93,6 @@ def _collate_fn(batch):
     #ilens = torch.from_numpy(ilens)
 
     label_tensor = torch.from_numpy(label).float()
-    print('collate_time====', time.time()-start_time)
     return mixtures_pad, label_tensor
 
 

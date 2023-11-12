@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import time
+from torchviz import make_dot
 
 from utils import overlap_and_add
 
@@ -61,7 +62,7 @@ class gMLP(nn.Module):
                 nn.init.xavier_normal_(p)
 
     def forward(self, mixture):
-        start_time = time.time()
+
         """
         Args:
             mixture: [M, T], M is batch size, T is #samples
@@ -75,22 +76,16 @@ class gMLP(nn.Module):
         mixture_w = self.encoder(mixture)
         """通过separation网络计算mask
         """
-        encoder_time = time.time()
-        print('encoder_time====', encoder_time-start_time)
 
         est_mask = self.separator(mixture_w)
         """经过decoder得到原信号
         """
-        separator_time = time.time()
-        print('separater_time====', separator_time - encoder_time)
 
         M, N, K = mixture_w.size()
         est_mask = est_mask.view(M, self.C, N, K)
 
         est_source = self.decoder(mixture_w, est_mask)
 
-        decoder_time = time.time()
-        print('decoder_time====', decoder_time-separator_time)
         
 
         # T changed after conv1d in encoder, fix it here
@@ -107,9 +102,6 @@ class gMLP(nn.Module):
         channel_1 = est_source[:, 1, :]
         classifier_output0 = self.classifier0(channel_0)
         classifier_output1 = self.classifier1(channel_1)
-
-        classifier_time = time.time()
-        print('classifier_time====', classifier_time-decoder_time, flush=True)
 
         combined_classifier_output = torch.cat((classifier_output0, classifier_output1), dim=1)
         return combined_classifier_output
@@ -475,3 +467,6 @@ if __name__ == '__main__':
     print(splited_outputs0)
     print(splited_outputs0.shape)
     print(splited_outputs1.shape)
+    #g = make_dot(output.mean(), params=dict(gmlp.named_parameters()), show_attrs=True, show_saved=True)
+    g = make_dot(output.mean())
+    g.view()
